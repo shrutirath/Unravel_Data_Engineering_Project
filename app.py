@@ -1,13 +1,11 @@
 from flask import Flask, jsonify
 import sqlite3
-from datetime import datetime
 
 app = Flask(__name__)
 DB_PATH = 'data/news_articles.db'
 
 
 def fetch_latest_articles(limit=5):
-    print("here" * 80)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -38,7 +36,6 @@ def fetch_latest_articles(limit=5):
 @app.route('/api/latest-articles', methods=['GET'])
 def latest_articles():
     articles = fetch_latest_articles()
-    print(articles)
     return jsonify({
         "status": "success",
         "data": articles

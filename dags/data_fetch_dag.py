@@ -13,7 +13,7 @@ default_args = {
 }
 
 
-def hashIdFromTitle(title): #Unique Id creation uusing title of the news
+def hashIdFromTitle(title): #Unique ID creation using title of the news
     hash_object = hashlib.sha256(title.encode('utf-8')).digest()
     base64_hash = base64.urlsafe_b64encode(hash_object).decode('utf-8')
     return base64_hash[:-1]
@@ -25,46 +25,36 @@ def fetch_data_from_PhocusWire(last_time):# fetching the data from Phocuswire in
         "Accept-Language": "en-US,en;q=0.9",
     }
     response = requests.get(url,headers = headers)
-    # 2. Parse HTML
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    # print(soup)
 
-    # 3. Find and extract the data
     article_list = soup.find("div",class_="article-list")
     quotes = article_list.find_all("div",class_ = "item")
-    # print(quotes)
+
     article_data = []
-    # 4. Display the data
+
     for quote in quotes:
         text = (quote.find("a",class_= "title"))
         if text:
-            try:
-                author_metadata = (quote.find("div", class_="author"))
-                author_name = author_metadata.get_text()
-                author_name = author_name.replace("By ", "").strip()
-                split_var = author_name.split('|')
-                if split_var[0] and len(split_var) > 1:
-                    author_name  = split_var[0].strip()
-                else:
-                    author_name = ""
-                if split_var[1]:
-                    timestamp = split_var[1].strip()
-                    timestamp = datetime.strptime(timestamp, "%B %d, %Y")
-                    now = datetime.now()
-                    timestamp = timestamp.replace(hour = now.hour,minute = now.minute,second = now.second)
-                else:
-                    timestamp = datetime.now()
-                # timestamp = author_name.split('|')[1]
-            except Exception as e:
-                print("ye text hai ab ::::::: ", text)
-                print("ye qupwojew hai n::: ", quote)
-                assert  False
+            author_metadata = (quote.find("div", class_="author"))
+            author_name = author_metadata.get_text()
+            author_name = author_name.replace("By ", "").strip()
+            split_var = author_name.split('|')
+            if split_var[0] and len(split_var) > 1:
+                author_name  = split_var[0].strip()
+            else:
+                author_name = ""
+            if split_var[1]:
+                timestamp = split_var[1].strip()
+                timestamp = datetime.strptime(timestamp, "%B %d, %Y")
+                now = datetime.now()
+                timestamp = timestamp.replace(hour = 00,minute = 00,second = 00)
+            else:
+                timestamp = datetime.now()
 
             txt = text.get_text()
             url = text.get('href')
             url = 'https://www.phocuswire.com'+ url
-
             if(timestamp > last_time):
                 article_data.append({
                     "article_id":hashIdFromTitle(txt),
@@ -86,7 +76,6 @@ def fetch_data_from_Skift(last_time):# fetching data from Skift incrementally us
     }
     response = requests.get(url,headers = headers)
     article_data = []
-    print(response)
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -143,7 +132,7 @@ def insert_data(): #function to create table and insert data from both websites
     article_data = fetch_data_from_PhocusWire(last_time)
     for data in article_data :
         news_cursor.execute('''
-            INSERT INTO Article_Table (Article_id, URL, Publication_timestamp, Source, Author, Title, Created_at)
+            INSERT OR IGNORE INTO Article_Table (Article_id, URL, Publication_timestamp, Source, Author, Title, Created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''',(data['article_id'],
             data['URL'],
@@ -155,7 +144,7 @@ def insert_data(): #function to create table and insert data from both websites
     article_data = fetch_data_from_Skift(last_time)
     for data in article_data :
         news_cursor.execute('''
-            INSERT INTO Article_Table (Article_id, URL, Publication_timestamp, Source, Author, Title, Created_at)
+            INSERT OR IGNORE INTO Article_Table (Article_id, URL, Publication_timestamp, Source, Author, Title, Created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''',(data['article_id'],
             data['URL'],
@@ -170,12 +159,12 @@ def insert_data(): #function to create table and insert data from both websites
 with DAG('insert_data', #implementing DAG to schedule the data insertion
          default_args=default_args,
          schedule='@daily',
-         catchup=False) as dag:
+         catchup=False,
+         is_paused_upon_creation=False) as dag:
 
    insert_data_task = PythonOperator(
         task_id='insert_data',
         python_callable=insert_data
    )
-
 
 

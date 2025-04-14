@@ -1,6 +1,6 @@
 # 📰 Travel News Pipeline Project
 
-This project builds a **data pipeline** that scrapes the **latest travel news articles** from two popular sources: [Skift](https://skift.com) and [PhocusWire](https://www.phocuswire.com/). The pipeline runs **daily using Airflow**, stores results in **SQLite**, and presents the latest 5 articles on a **Streamlit UI**, powered by a **Flask API** — all containerized with **Docker Compose**.
+This project builds a **data pipeline** that scrapes the **latest travel news articles** from two popular sources: [Skift](https://skift.com) and [PhocusWire](https://www.phocuswire.com/). The pipeline runs **daily using Airflow**, stores results in **SQLite**, and presents the latest 5 articles on a **Streamlit UI**, powered by a **Flask API** — all containerized with **Docker**.
 
 ---
 
@@ -17,14 +17,14 @@ This project builds a **data pipeline** that scrapes the **latest travel news ar
 
 ## 🧩 Architecture Overview
 
-Skift + PhocusWire ↓ [Web Scraping: data_fetch.py] ↓ [Airflow DAG: Daily Insert to DB] ↓ [SQLite Database (news_articles.db)] ↓ [Flask API] ←────────── Streamlit UI ↓ /api/latest-articles
+Skift + PhocusWire ↓ [Web Scraping: data_fetch_dag.py] ↓ [Airflow DAG: Daily Insert to DB] ↓ [SQLite Database (news_articles.db)] ↓ [Flask API] ←────────── Streamlit UI ↓ /api/latest-articles
 
 
 ---
 
 ## 🛠️ Components
 
-### 1. `data_fetch.py`
+### 1. `data_fetch_dag.py`
 
 - Scrapes articles from **Skift** and **PhocusWire**
 - Cleans and transforms data
@@ -67,7 +67,7 @@ project-root/
 ├── docker-compose.yml            # Docker orchestration for all services
 ├── Readme.md           
 ├── data/
-│   └── news_articles_final.db    # SQLite database
+│   └── news_articles.db          # SQLite database
 └── script/
     └── entrypoint.sh             # Custom Airflow entrypoint script
 ```
@@ -79,8 +79,8 @@ project-root/
 ### 1. Clone the repository
 
 ```bash
-git clone <your_repo_url>
-cd <project_folder>
+git clone https://github.com/shrutirath/Unravel_Data_Engineering_Project.git
+cd Unravel_Data_Engineering_Project
 
 Access Airflow at: http://localhost:8080
 

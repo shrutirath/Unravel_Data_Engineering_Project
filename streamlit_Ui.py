@@ -11,7 +11,6 @@ API_URL = "http://flask_api:5100/api/latest-articles"
 try:
     response = requests.get(API_URL)
     data = response.json()
-    print(data)
     if data["status"] == "success":
         articles = data["data"]
         for article in articles:
