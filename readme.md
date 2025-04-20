@@ -19,7 +19,7 @@ This project builds a **data pipeline** that scrapes the **latest travel news ar
 
 Skift + PhocusWire ↓ [Web Scraping: data_fetch_dag.py] ↓ [Airflow DAG: Daily Insert to DB] ↓ [SQLite Database (news_articles.db)] ↓ [Flask API] ←────────── Streamlit UI ↓ /api/latest-articles
 
-![Architecture Diagram](Unravel_arch.png)
+![Architecture Diagram](architecture.png)
 
 
 ---
